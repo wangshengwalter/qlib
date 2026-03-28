@@ -109,10 +109,14 @@ class Alpha158(DataHandlerLP):
         process_type=DataHandlerLP.PTYPE_A,
         filter_pipe=None,
         inst_processors=None,
+        label_days_offset=2,
         **kwargs,
     ):
         infer_processors = check_transform_proc(infer_processors, fit_start_time, fit_end_time)
         learn_processors = check_transform_proc(learn_processors, fit_start_time, fit_end_time)
+
+        # Validate and set label_days_offset
+        self.label_days_offset = label_days_offset if label_days_offset >= 2 else 2
 
         data_loader = {
             "class": "QlibDataLoader",
@@ -149,7 +153,7 @@ class Alpha158(DataHandlerLP):
         return Alpha158DL.get_feature_config(conf)
 
     def get_label_config(self):
-        return ["Ref($close, -2)/Ref($close, -1) - 1"], ["LABEL0"]
+        return [f"Ref($close, -{self.label_days_offset})/Ref($close, -1) - 1"], ["LABEL0"]
 
 
 class Alpha158vwap(Alpha158):
